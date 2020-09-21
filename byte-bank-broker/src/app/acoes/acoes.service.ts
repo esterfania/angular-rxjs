@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Acao, Acoes, AcoesAPI } from './modelo/acoes';
@@ -11,12 +11,14 @@ const { api } = environment;
 export class AcoesService {
   constructor(private http: HttpClient) {}
 
-  getAcoes(): Observable<Acoes> {
-    return this.http.get<AcoesAPI>(api + '/acoes').pipe(
-      tap((res) => console.log(res)),
-      pluck('payload'),
-      map((res: Acoes) => res.sort((a, b) => this.orderValuesCresc(a, b)))
-    );
+  getAcoes(valor?: string): Observable<Acoes> {
+    const params = valor ? new HttpParams().append('valor', valor) : undefined;
+    return this.http
+      .get<AcoesAPI>(api + '/acoes', { params })
+      .pipe(
+        pluck('payload'),
+        map((res: Acoes) => res.sort((a, b) => this.orderValuesCresc(a, b)))
+      );
   }
 
   private orderValuesCresc(a: Acao, b: Acao) {
